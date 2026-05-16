@@ -92,8 +92,8 @@
         .main-container {
             max-width: 1300px;
             width: 100%;
-            margin: 15px auto;
-            padding: 50px 30px 40px 30px; /* Отступ сверху вместо удаленного штриха */
+            margin: 0 auto;
+            padding: 40px 30px 40px 30px; /* Отступ сверху вместо удаленного штриха */
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -262,7 +262,7 @@
 
         .browser-header {
             background-color: #202733;
-            padding: 10px 20px;
+            padding: 10px 10px;
             border-bottom: 2px solid #141921;
         }
 
@@ -544,9 +544,9 @@
             if(!promptInput.value.trim()) return;
             
             // Имитируем заполнение полей сгенерированным кодом
-            document.getElementById('htmlCode').innerText = `<div class="welcome-card">\n  <h2>🎨 Твой дизайн готов!</h2>\n  <p>Этот блок сгенерирован автоматически и отрендерился внутри фрейма в реальном времени.</p>\n  <button id="alertBtn">Проверить JS</button>\n</div>`;
+            document.getElementById('htmlCode').innerText = `<div class="welcome-card">\n  <h2>Preview Design</h2>\n  <p>Generated in real time</p>\n  <button id="alertBtn">Check JS</button>\n</div>`;
             document.getElementById('cssCode').innerText = `.welcome-card {\n  background: linear-gradient(135deg, #42d3a5, #386280);\n  padding: 30px;\n  border-radius: 12px;\n  color: #fff;\n  text-align: center;\n  box-shadow: 0 8px 16px rgba(0,0,0,0.1);\n}\nbutton {\n  background: #fff;\n  border: none;\n  padding: 10px 20px;\n  border-radius: 6px;\n  font-weight: bold;\n  cursor: pointer;\n  color: #1e2530;\n}`;
-            document.getElementById('jsCode').innerText = `const btn = document.getElementById('alertBtn');\nbtn.addEventListener('click', () => {\n  alert('Интерактив тоже работает!');\n});`;
+            document.getElementById('jsCode').innerText = `const btn = document.getElementById('alertBtn');\nbtn.addEventListener('click', () => {\n  alert('Button work');\n});`;
             
             // Синхронно пересчитываем строки и запускаем рендеринг
             updateLineNumbers('htmlCode', 'htmlLines');
