@@ -54,8 +54,9 @@
             gap: 15px;
         }
 
+        /* Обнови эти стили для кнопок в CSS */
         .btn {
-            background: transparent;
+            background-color: #1e2530; /* Заливка цветом основного фона сайта */
             border: 2px solid;
             border-radius: 6px;
             cursor: pointer;
@@ -68,21 +69,23 @@
         }
 
         .btn-signup {
-            border-color: #42d3a5; /* Зеленый из макета */
+            border-color: #42d3a5;
             color: #42d3a5;
         }
 
         .btn-signup:hover {
-            background-color: rgba(66, 211, 165, 0.1);
+            background-color: #42d3a5;
+            color: #1e2530; /* При наведении текст становится темным */
         }
 
         .btn-login {
-            border-color: #386280; /* Синеватый из макета */
+            border-color: #386280;
             color: #52a3e1;
         }
 
         .btn-login:hover {
-            background-color: rgba(56, 98, 128, 0.2);
+            background-color: #386280;
+            color: #ffffff;
         }
 
         /* Декоративная штриховая линия */
@@ -301,8 +304,6 @@
             <a href="#login" class="btn btn-login" onclick="alert('Окно входа')">Log in</a>
         </div>
     </header>
-
-    <div class="divider"></div>
 
     <div class="main-container">
         <div class="intro-text">
