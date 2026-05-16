@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ai Assistant - Authorization</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Overpass+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1e2530; 
+            font-family: 'Overpass Mono', monospace;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .auth-card {
+            background-color: #2b3444;
+            border: 1px solid #141921;
+            width: 100%;
+            max-width: 460px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auth-tabs-nav {
+            display: flex;
+            background-color: #202733;
+            border-bottom: 1px solid #141921;
+            padding: 20px 25px 8px 25px;
+            gap: 25px;
+        }
+
+        .auth-tab {
+            font-size: 28px;
+            font-weight: 700;
+            color: #141921;
+            cursor: pointer;
+            user-select: none;
+            padding-bottom: 5px;
+            text-decoration: none;
+        }
+
+        .auth-tab.active {
+            color: #ffffff;
+            text-decoration: underline;
+            text-underline-offset: 5px;
+        }
+
+        .auth-form {
+            padding: 35px 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-group label {
+            font-size: 16px;
+            font-weight: 400;
+            color: #ffffff;
+        }
+
+        .auth-input {
+            width: 100%;
+            height: 44px;
+            background-color: #1e2530;
+            border: 2px solid #59687a;
+            border-radius: 10px;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 16px;
+            padding: 0 15px;
+            outline: none;
+        }
+
+        .auth-input:focus {
+            border-color: #52a3e1;
+        }
+
+        .btn-submit-auth {
+            width: 100%;
+            height: 46px;
+            background-color: transparent;
+            border: 2px solid #ffffff;
+            border-radius: 8px;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 20px;
+            font-weight: 400;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-submit-auth:hover {
+            background-color: #ffffff;
+            color: #1e2530;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <div class="auth-tabs-nav">
+            <span class="auth-tab" id="tabSignup">Sign up</span>
+            <span class="auth-tab" id="tabLogin">Log in</span>
+        </div>
+        <div class="auth-form">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" class="auth-input" id="authUsername" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="auth-input" id="authPassword">
+            </div>
+            <a href="index.html" class="btn-submit-auth" id="authSubmitBtn">Sign up</a>
+        </div>
+    </div>
+
+    <script>
+        const tabSignup = document.getElementById('tabSignup');
+        const tabLogin = document.getElementById('tabLogin');
+        const authSubmitBtn = document.getElementById('authSubmitBtn');
+
+        function setAuthState(state) {
+            if (state === 'signup') {
+                tabSignup.classList.add('active');
+                tabLogin.classList.remove('active');
+                authSubmitBtn.innerText = 'Sign up';
+            } else {
+                tabLogin.classList.add('active');
+                tabSignup.classList.remove('active');
+                authSubmitBtn.innerText = 'Log in';
+            }
+        }
+
+        tabSignup.addEventListener('click', () => setAuthState('signup'));
+        tabLogin.addEventListener('click', () => setAuthState('login'));
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode');
+        
+        if (mode === 'login') {
+            setAuthState('login');
+        } else {
+            setAuthState('signup');
+        }
+    </script>
+</body>
+</html>
