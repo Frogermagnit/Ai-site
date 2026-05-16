@@ -1,10 +1,423 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <title>Мой сайт</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant Code Generator</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a2230;
+            font-family: 'Courier New', Courier, monospace;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка сайта */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+
+        .brand p {
+            margin: 5px 0 0 0;
+            font-size: 12px;
+            color: #a0aec0;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            background: transparent;
+            border: 2px solid;
+            border-radius: 6px;
+            color: #ffffff;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 16px;
+            padding: 8px 20px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-signup {
+            border-color: #52c41a;
+            color: #52c41a;
+        }
+
+        .btn-signup:hover {
+            background-color: rgba(82, 196, 26, 0.1);
+        }
+
+        .btn-login {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .btn-login:hover {
+            background-color: rgba(24, 144, 255, 0.1);
+        }
+
+        /* Декоративный штриховой разделитель */
+        .divider {
+            width: 100%;
+            height: 4px;
+            background-image: linear-gradient(to right, #ffffff 50%, transparent 50%);
+            background-size: 30px 4px;
+            margin-bottom: 40px;
+        }
+
+        /* Главный контейнер */
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px 40px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .intro-text {
+            text-align: center;
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+
+        .intro-text h2 {
+            font-size: 18px;
+            font-weight: normal;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #e2e8f0;
+        }
+
+        .intro-text p {
+            font-size: 16px;
+            color: #a0aec0;
+            margin: 0;
+        }
+
+        /* Блок инпута генератора */
+        .generator-box {
+            display: flex;
+            width: 100%;
+            max-width: 750px;
+            gap: 15px;
+            margin-bottom: 50px;
+            align-items: flex-end;
+        }
+
+        .prompt-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .prompt-input {
+            width: 100%;
+            min-height: 46px;
+            max-height: 150px; /* Ограничение расширения вверх */
+            background-color: #242f41;
+            border: 2px solid #4a5568;
+            border-radius: 23px;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 16px;
+            padding: 10px 25px;
+            resize: none;
+            outline: none;
+            overflow-y: auto;
+            line-height: 1.4;
+            transition: border-color 0.2s;
+        }
+
+        .prompt-input:focus {
+            border-color: #a0aec0;
+        }
+
+        .btn-generate {
+            background-color: #242f41;
+            border: 2px solid #4a5568;
+            border-radius: 12px;
+            color: #a0aec0;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: inherit;
+            height: 46px;
+            transition: all 0.2s;
+        }
+
+        .btn-generate:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+
+        /* Сетка для 3-х колонок */
+        .editors-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            flex-grow: 1;
+            min-height: 350px;
+        }
+
+        .editor-column {
+            background-color: #242f41;
+            border: 2px solid #1a2230;
+            outline: 1px solid #4a5568;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #1d2636;
+            padding: 8px 15px;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .editor-title {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .editor-title.html { color: #e34c26; }
+        .editor-title.css { color: #264de4; }
+        .editor-title.js { color: #f0db4f; }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: #718096;
+            cursor: pointer;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: #ffffff;
+        }
+
+        .editor-body {
+            position: relative;
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            max-height: 450px; /* Фиксированная высота окна вывода */
+        }
+
+        /* Стилизация скроллбара (как на макете) */
+        .editor-body::-webkit-scrollbar,
+        .prompt-input::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .editor-body::-webkit-scrollbar-track,
+        .prompt-input::-webkit-scrollbar-track {
+            background: #1d2636;
+        }
+
+        .editor-body::-webkit-scrollbar-thumb,
+        .prompt-input::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border: 2px solid #1d2636;
+            border-radius: 4px;
+        }
+
+        .code-container {
+            margin: 0;
+            display: flex;
+        }
+
+        .line-numbers {
+            color: #4a5568;
+            text-align: right;
+            padding-right: 15px;
+            user-select: none;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .code-content {
+            color: #a0aec0;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 14px;
+            line-height: 1.5;
+            outline: none;
+            width: 100%;
+        }
+
+        /* Адаптивность для мобилок */
+        @media (max-width: 900px) {
+            .editors-grid {
+                grid-template-columns: 1fr;
+            }
+            header {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Привет!</h1>
-  <p>Это мой сайт на GitHub.</p>
+
+    <header>
+        <div class="brand">
+            <h1>Ai Assistant</h1>
+            <p>Your best choice to get site design</p>
+        </div>
+        <div class="auth-buttons">
+            <a href="#signup" class="btn btn-signup" onclick="alert('Перенаправление на страницу регистрации...')">Sign up</a>
+            <a href="#login" class="btn btn-login" onclick="alert('Перенаправление на страницу входа...')">Log in</a>
+        </div>
+    </header>
+
+    <div class="divider"></div>
+
+    <div class="main-container">
+        <div class="intro-text">
+            <h2>This website allows you to create a template-based website design for your project</h2>
+            <p>Write down your idea</p>
+        </div>
+
+        <div class="generator-box">
+            <div class="prompt-wrapper">
+                <textarea class="prompt-input" id="promptInput" placeholder="Ask AI..." rows="1"></textarea>
+            </div>
+            <button class="btn-generate" id="generateBtn">Generate</button>
+        </div>
+
+        <div class="editors-grid">
+            <div class="editor-column">
+                <div class="editor-header">
+                    <span class="editor-title html">HTML</span>
+                    <button class="copy-btn" onclick="copyCode('htmlCode')" title="Копировать код">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                </div>
+                <div class="editor-body">
+                    <div class="code-container">
+                        <div class="line-numbers" id="htmlLines">1</div>
+                        <div class="code-content" id="htmlCode" contenteditable="true">...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-column">
+                <div class="editor-header">
+                    <span class="editor-title css">CSS</span>
+                    <button class="copy-btn" onclick="copyCode('cssCode')" title="Копировать код">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                </div>
+                <div class="editor-body">
+                    <div class="code-container">
+                        <div class="line-numbers" id="cssLines">1</div>
+                        <div class="code-content" id="cssCode" contenteditable="true">...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-column">
+                <div class="editor-header">
+                    <span class="editor-title js">JS</span>
+                    <button class="copy-btn" onclick="copyCode('jsCode')" title="Копировать код">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                </div>
+                <div class="editor-body">
+                    <div class="code-container">
+                        <div class="line-numbers" id="jsLines">1</div>
+                        <div class="code-content" id="jsCode" contenteditable="true">...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Изменение высоты строки ввода (авто-скролл и расширение)
+        const promptInput = document.getElementById('promptInput');
+        promptInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+
+        // Функция динамического пересчета строк в редакторах
+        function updateLineNumbers(codeId, linesId) {
+            const codeContent = document.getElementById(codeId);
+            const linesContainer = document.getElementById(linesId);
+            const text = codeContent.innerText;
+            const linesCount = text.split('\n').length;
+            
+            let linesHtml = '';
+            for (let i = 1; i <= linesCount; i++) {
+                linesHtml += i + '<br>';
+            }
+            linesContainer.innerHTML = linesHtml;
+        }
+
+        // Следим за изменениями контента (для ручного ввода)
+        ['htmlCode', 'cssCode', 'jsCode'].forEach(id => {
+            const el = document.getElementById(id);
+            const linesId = id.replace('Code', 'Lines');
+            el.addEventListener('input', () => updateLineNumbers(id, linesId));
+        });
+
+        // Имитация генерации ИИ при нажатии на кнопку Generate
+        document.getElementById('generateBtn').addEventListener('click', () => {
+            if(!promptInput.value.trim()) {
+                alert('Пожалуйста, введите описание идеи в поле.');
+                return;
+            }
+            
+            // Тестовый массив данных, имитирующий код
+            document.getElementById('htmlCode').innerText = `\n<div class="app-card">\n  <h2>Заголовок проекта</h2>\n  <p>Этот интерфейс был полностью описан словами.</p>\n  <button id="clickMe">Интерактив</button>\n</div>`;
+            document.getElementById('cssCode').innerText = `/* Оформление карточки */\n.app-card {\n  background: #2d3748;\n  padding: 24px;\n  border-radius: 8px;\n  border: 1px solid #4a5568;\n}\nh2 {\n  color: #3182ce;\n  margin-top: 0;\n}`;
+            document.getElementById('jsCode').innerText = `// Скрипты элементов\nconst btn = document.getElementById('clickMe');\nbtn.addEventListener('click', () => {\n  console.log('Сгенерированный функционал сработал!');\n});`;
+            
+            // Синхронно обновляем нумерацию строк во всех окнах
+            updateLineNumbers('htmlCode', 'htmlLines');
+            updateLineNumbers('cssCode', 'cssLines');
+            updateLineNumbers('jsCode', 'jsLines');
+        });
+
+        // Кнопка буфера обмена
+        function copyCode(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Код успешно скопирован!');
+            });
+        }
+    </script>
 </body>
 </html>
