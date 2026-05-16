@@ -26,7 +26,6 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Чёрный Хедер */
         header {
             background-color: #0A0C10;
             display: flex;
@@ -56,7 +55,7 @@
         }
 
         .btn {
-            background-color: #1e2530; /* Заливка цветом основного фона */
+            background-color: #1e2530; 
             border: 2px solid;
             border-radius: 6px;
             cursor: pointer;
@@ -93,7 +92,7 @@
             max-width: 1300px;
             width: 100%;
             margin: 0 auto;
-            padding: 40px 30px 40px 30px; /* Отступ сверху вместо удаленного штриха */
+            padding: 40px 30px 40px 30px; 
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -252,7 +251,7 @@
             width: 100%;
             height: 550px;
             background-color: #2b3444;
-            border: 3px solid #52a3e1; /* Яркая синяя рамка вокруг превью */
+            border: 3px solid #52a3e1; 
             border-radius: 4px;
             display: flex;
             flex-direction: column;
@@ -279,7 +278,6 @@
             background-color: #2b3444;
         }
 
-        /* Текст No Design наискосок */
         .no-design-placeholder {
             position: absolute;
             top: 0;
@@ -292,7 +290,7 @@
             font-size: 90px;
             font-weight: 700;
             color: #ffffff;
-            transform: rotate(-25deg); /* Поворот текста */
+            transform: rotate(-25deg); 
             user-select: none;
             pointer-events: none;
             z-index: 5;
@@ -304,7 +302,7 @@
             width: 100%;
             height: 100%;
             border: none;
-            background-color: #ffffff; /* Белый фон для создаваемого сайта */
+            background-color: #ffffff; 
             display: none;
             position: relative;
             z-index: 10;
@@ -349,14 +347,13 @@
             width: 100%;
         }
 
-        /* Чёрный Футер (Без штриха) */
         footer {
             background-color: #000000;
             width: 100%;
             padding: 20px 30px;
-            text-align: left; /* Выравнивание влево */
+            text-align: left; 
             font-size: 14px;
-            color: #437199; /* Синеватый оттенок шрифта версии */
+            color: #437199; 
         }
 
         @media (max-width: 950px) {
@@ -464,14 +461,12 @@
     </footer>
 
     <script>
-        // Динамическое изменение высоты инпута
         const promptInput = document.getElementById('promptInput');
         promptInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
         });
 
-        // Функция обновления номеров строк
         function updateLineNumbers(codeId, linesId) {
             const codeContent = document.getElementById(codeId);
             const linesContainer = document.getElementById(linesId);
@@ -485,7 +480,6 @@
             linesContainer.innerHTML = linesHtml;
         }
 
-        // Функция сборки кода из колонок и вывода в Live Preview
         function renderLiveCode() {
             const html = document.getElementById('htmlCode').innerText;
             const css = document.getElementById('cssCode').innerText;
@@ -494,7 +488,6 @@
             const iframe = document.getElementById('livePreview');
             const placeholder = document.getElementById('noDesignText');
             
-            // Если в полях пусто или базовые три точки — показываем заглушку No Design
             if ((html === '...' || html.trim() === '') && 
                 (css === '...' || css.trim() === '') && 
                 (js === '...' || js.trim() === '')) {
@@ -503,7 +496,6 @@
                 return;
             }
             
-            // Иначе прячем текст и включаем отображение сайта внутри фрейма
             placeholder.style.display = 'none';
             iframe.style.display = 'block';
             
@@ -528,7 +520,6 @@
             iframeDoc.close();
         }
 
-        // Назначаем слежение за вводом текста (чтобы превью обновлялось на лету при изменении кода)
         ['htmlCode', 'cssCode', 'jsCode'].forEach(id => {
             const el = document.getElementById(id);
             const linesId = id.replace('Code', 'Lines');
@@ -539,16 +530,13 @@
             });
         });
 
-        // Кнопка ИИ-Генерации
         document.getElementById('generateBtn').addEventListener('click', () => {
             if(!promptInput.value.trim()) return;
             
-            // Имитируем заполнение полей сгенерированным кодом
             document.getElementById('htmlCode').innerText = `<div class="welcome-card">\n  <h2>Preview Design</h2>\n  <p>Generated in real time</p>\n  <button id="alertBtn">Check JS</button>\n</div>`;
             document.getElementById('cssCode').innerText = `.welcome-card {\n  background: linear-gradient(135deg, #42d3a5, #386280);\n  padding: 30px;\n  border-radius: 12px;\n  color: #fff;\n  text-align: center;\n  box-shadow: 0 8px 16px rgba(0,0,0,0.1);\n}\nbutton {\n  background: #fff;\n  border: none;\n  padding: 10px 20px;\n  border-radius: 6px;\n  font-weight: bold;\n  cursor: pointer;\n  color: #1e2530;\n}`;
             document.getElementById('jsCode').innerText = `const btn = document.getElementById('alertBtn');\nbtn.addEventListener('click', () => {\n  alert('Button work');\n});`;
             
-            // Синхронно пересчитываем строки и запускаем рендеринг
             updateLineNumbers('htmlCode', 'htmlLines');
             updateLineNumbers('cssCode', 'cssLines');
             updateLineNumbers('jsCode', 'jsLines');
