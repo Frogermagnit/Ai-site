@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Assistant Code Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Overpass+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
     <style>
         *, *::before, *::after {
             box-sizing: border-box;
@@ -12,33 +16,36 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #1a2230;
-            font-family: 'Courier New', Courier, monospace;
+            background-color: #1e2530; /* Точный цвет фона сайта */
+            font-family: 'Overpass Mono', monospace;
             color: #ffffff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Шапка сайта */
+        /* Шапка */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 40px;
+            padding: 20px 30px;
         }
 
         .brand h1 {
             margin: 0;
             font-size: 24px;
-            font-weight: normal;
-            letter-spacing: 1px;
+            font-weight: 500;
+            letter-spacing: -0.5px;
         }
 
         .brand p {
-            margin: 5px 0 0 0;
-            font-size: 12px;
-            color: #a0aec0;
+            margin: 6px 0 0 0;
+            font-size: 13px;
+            color: #ffffff;
+            opacity: 0.9;
         }
 
         .auth-buttons {
@@ -50,48 +57,49 @@
             background: transparent;
             border: 2px solid;
             border-radius: 6px;
-            color: #ffffff;
             cursor: pointer;
             font-family: inherit;
-            font-size: 16px;
-            padding: 8px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 8px 22px;
             text-decoration: none;
             transition: all 0.2s ease;
         }
 
         .btn-signup {
-            border-color: #52c41a;
-            color: #52c41a;
+            border-color: #42d3a5; /* Зеленый из макета */
+            color: #42d3a5;
         }
 
         .btn-signup:hover {
-            background-color: rgba(82, 196, 26, 0.1);
+            background-color: rgba(66, 211, 165, 0.1);
         }
 
         .btn-login {
-            border-color: #1890ff;
-            color: #1890ff;
+            border-color: #386280; /* Синеватый из макета */
+            color: #52a3e1;
         }
 
         .btn-login:hover {
-            background-color: rgba(24, 144, 255, 0.1);
+            background-color: rgba(56, 98, 128, 0.2);
         }
 
-        /* Декоративный штриховой разделитель */
+        /* Декоративная штриховая линия */
         .divider {
             width: 100%;
             height: 4px;
             background-image: linear-gradient(to right, #ffffff 50%, transparent 50%);
-            background-size: 30px 4px;
+            background-size: 24px 4px;
             margin-bottom: 40px;
+            opacity: 0.9;
         }
 
-        /* Главный контейнер */
+        /* Контейнер */
         .main-container {
-            max-width: 1200px;
+            max-width: 1300px;
             width: 100%;
             margin: 0 auto;
-            padding: 0 20px 40px 20px;
+            padding: 0 30px 40px 30px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -100,31 +108,29 @@
 
         .intro-text {
             text-align: center;
-            max-width: 800px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .intro-text h2 {
-            font-size: 18px;
-            font-weight: normal;
-            line-height: 1.6;
+            font-size: 16px;
+            font-weight: 400;
             margin-bottom: 15px;
-            color: #e2e8f0;
+            color: #ffffff;
         }
 
         .intro-text p {
             font-size: 16px;
-            color: #a0aec0;
+            color: #ffffff;
             margin: 0;
         }
 
-        /* Блок инпута генератора */
+        /* Поле ввода промпта */
         .generator-box {
             display: flex;
             width: 100%;
-            max-width: 750px;
-            gap: 15px;
-            margin-bottom: 50px;
+            max-width: 600px;
+            gap: 12px;
+            margin-bottom: 45px;
             align-items: flex-end;
         }
 
@@ -135,36 +141,30 @@
 
         .prompt-input {
             width: 100%;
-            min-height: 46px;
-            max-height: 150px; /* Ограничение расширения вверх */
-            background-color: #242f41;
-            border: 2px solid #4a5568;
-            border-radius: 23px;
-            color: #ffffff;
+            min-height: 42px;
+            max-height: 150px;
+            background-color: #1e2530;
+            border: 2px solid #59687a; 
+            border-radius: 12px;
+            color: #42d3a5; /* Текст ввода */
             font-family: inherit;
-            font-size: 16px;
-            padding: 10px 25px;
+            font-size: 15px;
+            padding: 10px 18px;
             resize: none;
             outline: none;
             overflow-y: auto;
-            line-height: 1.4;
-            transition: border-color 0.2s;
-        }
-
-        .prompt-input:focus {
-            border-color: #a0aec0;
         }
 
         .btn-generate {
-            background-color: #242f41;
-            border: 2px solid #4a5568;
-            border-radius: 12px;
-            color: #a0aec0;
-            padding: 10px 20px;
-            font-size: 16px;
+            background-color: #1e2530;
+            border: 2px solid #59687a;
+            border-radius: 8px;
+            color: #52a3e1;
+            padding: 0 16px;
+            font-size: 14px;
             cursor: pointer;
             font-family: inherit;
-            height: 46px;
+            height: 42px;
             transition: all 0.2s;
         }
 
@@ -173,20 +173,18 @@
             color: #ffffff;
         }
 
-        /* Сетка для 3-х колонок */
+        /* Сетка колонок */
         .editors-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 25px;
             width: 100%;
             flex-grow: 1;
-            min-height: 350px;
         }
 
         .editor-column {
-            background-color: #242f41;
-            border: 2px solid #1a2230;
-            outline: 1px solid #4a5568;
+            background-color: #2b3444; /* Цвет блоков из макета */
+            border: 1px solid #141921;
             border-radius: 4px;
             display: flex;
             flex-direction: column;
@@ -197,34 +195,35 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #1d2636;
-            padding: 8px 15px;
-            border-bottom: 1px solid #4a5568;
+            background-color: #202733;
+            padding: 10px 15px;
+            border-bottom: 2px solid #141921;
         }
 
         .editor-title {
             font-size: 14px;
-            font-weight: bold;
+            font-weight: 500;
         }
 
-        .editor-title.html { color: #e34c26; }
-        .editor-title.css { color: #264de4; }
-        .editor-title.js { color: #f0db4f; }
+        .editor-title.html { color: #437199; }
+        .editor-title.css { color: #437199; }
+        .editor-title.js { color: #764399; }
 
         .copy-btn {
             background: transparent;
-            border: none;
-            color: #718096;
+            border: 1px solid #141921;
+            border-radius: 4px;
+            color: #59687a;
             cursor: pointer;
-            padding: 2px;
+            padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: color 0.2s;
         }
 
         .copy-btn:hover {
             color: #ffffff;
+            border-color: #59687a;
         }
 
         .editor-body {
@@ -232,25 +231,24 @@
             flex-grow: 1;
             padding: 15px;
             overflow-y: auto;
-            max-height: 450px; /* Фиксированная высота окна вывода */
+            height: 500px;
         }
 
-        /* Стилизация скроллбара (как на макете) */
+        /* Скроллбары */
         .editor-body::-webkit-scrollbar,
         .prompt-input::-webkit-scrollbar {
-            width: 12px;
+            width: 14px;
         }
 
         .editor-body::-webkit-scrollbar-track,
         .prompt-input::-webkit-scrollbar-track {
-            background: #1d2636;
+            background: #2b3444;
         }
 
         .editor-body::-webkit-scrollbar-thumb,
         .prompt-input::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
-            border: 2px solid #1d2636;
-            border-radius: 4px;
+            background: #d4d4d4;
+            border: 2px solid #2b3444;
         }
 
         .code-container {
@@ -259,31 +257,28 @@
         }
 
         .line-numbers {
-            color: #4a5568;
+            color: #52a3e1; /* Голубые номера строк */
             text-align: right;
             padding-right: 15px;
             user-select: none;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 15px;
         }
 
         .code-content {
-            color: #a0aec0;
+            color: #52a3e1;
             white-space: pre-wrap;
             word-break: break-all;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 15px;
             outline: none;
             width: 100%;
         }
 
-        /* Адаптивность для мобилок */
-        @media (max-width: 900px) {
+        @media (max-width: 950px) {
             .editors-grid {
                 grid-template-columns: 1fr;
             }
-            header {
-                padding: 20px;
+            .editor-body {
+                height: 350px;
             }
         }
     </style>
@@ -296,8 +291,8 @@
             <p>Your best choice to get site design</p>
         </div>
         <div class="auth-buttons">
-            <a href="#signup" class="btn btn-signup" onclick="alert('Перенаправление на страницу регистрации...')">Sign up</a>
-            <a href="#login" class="btn btn-login" onclick="alert('Перенаправление на страницу входа...')">Log in</a>
+            <a href="#signup" class="btn btn-signup" onclick="alert('Окно регистрации')">Sign up</a>
+            <a href="#login" class="btn btn-login" onclick="alert('Окно входа')">Log in</a>
         </div>
     </header>
 
@@ -320,8 +315,8 @@
             <div class="editor-column">
                 <div class="editor-header">
                     <span class="editor-title html">HTML</span>
-                    <button class="copy-btn" onclick="copyCode('htmlCode')" title="Копировать код">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    <button class="copy-btn" onclick="copyCode('htmlCode')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
                 </div>
                 <div class="editor-body">
@@ -335,8 +330,8 @@
             <div class="editor-column">
                 <div class="editor-header">
                     <span class="editor-title css">CSS</span>
-                    <button class="copy-btn" onclick="copyCode('cssCode')" title="Копировать код">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    <button class="copy-btn" onclick="copyCode('cssCode')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
                 </div>
                 <div class="editor-body">
@@ -350,8 +345,8 @@
             <div class="editor-column">
                 <div class="editor-header">
                     <span class="editor-title js">JS</span>
-                    <button class="copy-btn" onclick="copyCode('jsCode')" title="Копировать код">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    <button class="copy-btn" onclick="copyCode('jsCode')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
                 </div>
                 <div class="editor-body">
@@ -365,14 +360,14 @@
     </div>
 
     <script>
-        // Изменение высоты строки ввода (авто-скролл и расширение)
+        // Динамическое изменение высоты ввода промпта
         const promptInput = document.getElementById('promptInput');
         promptInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
         });
 
-        // Функция динамического пересчета строк в редакторах
+        // Расчет и отрисовка номеров строк
         function updateLineNumbers(codeId, linesId) {
             const codeContent = document.getElementById(codeId);
             const linesContainer = document.getElementById(linesId);
@@ -386,37 +381,28 @@
             linesContainer.innerHTML = linesHtml;
         }
 
-        // Следим за изменениями контента (для ручного ввода)
         ['htmlCode', 'cssCode', 'jsCode'].forEach(id => {
             const el = document.getElementById(id);
             const linesId = id.replace('Code', 'Lines');
             el.addEventListener('input', () => updateLineNumbers(id, linesId));
         });
 
-        // Имитация генерации ИИ при нажатии на кнопку Generate
+        // Имитация генерации по клику на Generate
         document.getElementById('generateBtn').addEventListener('click', () => {
-            if(!promptInput.value.trim()) {
-                alert('Пожалуйста, введите описание идеи в поле.');
-                return;
-            }
+            if(!promptInput.value.trim()) return;
             
-            // Тестовый массив данных, имитирующий код
-            document.getElementById('htmlCode').innerText = `\n<div class="app-card">\n  <h2>Заголовок проекта</h2>\n  <p>Этот интерфейс был полностью описан словами.</p>\n  <button id="clickMe">Интерактив</button>\n</div>`;
-            document.getElementById('cssCode').innerText = `/* Оформление карточки */\n.app-card {\n  background: #2d3748;\n  padding: 24px;\n  border-radius: 8px;\n  border: 1px solid #4a5568;\n}\nh2 {\n  color: #3182ce;\n  margin-top: 0;\n}`;
-            document.getElementById('jsCode').innerText = `// Скрипты элементов\nconst btn = document.getElementById('clickMe');\nbtn.addEventListener('click', () => {\n  console.log('Сгенерированный функционал сработал!');\n});`;
+            document.getElementById('htmlCode').innerText = `\n<div class="container">\n  <h1>Overpass Mono подключен</h1>\n  <p>Все блоки синхронизированы.</p>\n</div>`;
+            document.getElementById('cssCode').innerText = `/* Оформление базовых стилей */\n.container {\n  padding: 20px;\n  text-align: center;\n}`;
+            document.getElementById('jsCode').innerText = `console.log("Интерфейс полностью готов к интеграции.");`;
             
-            // Синхронно обновляем нумерацию строк во всех окнах
             updateLineNumbers('htmlCode', 'htmlLines');
             updateLineNumbers('cssCode', 'cssLines');
             updateLineNumbers('jsCode', 'jsLines');
         });
 
-        // Кнопка буфера обмена
         function copyCode(id) {
             const text = document.getElementById(id).innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Код успешно скопирован!');
-            });
+            navigator.clipboard.writeText(text);
         }
     </script>
 </body>
