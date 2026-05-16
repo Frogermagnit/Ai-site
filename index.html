@@ -16,7 +16,7 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #1e2530; /* Точный цвет фона сайта */
+            background-color: #1e2530; 
             font-family: 'Overpass Mono', monospace;
             color: #ffffff;
             min-height: 100vh;
@@ -26,6 +26,7 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
+        /* Чёрный Хедер */
         header {
             background-color: #0A0C10;
             display: flex;
@@ -54,9 +55,8 @@
             gap: 15px;
         }
 
-        /* Обнови эти стили для кнопок в CSS */
         .btn {
-            background-color: #1e2530; /* Заливка цветом основного фона сайта */
+            background-color: #1e2530; /* Заливка цветом основного фона */
             border: 2px solid;
             border-radius: 6px;
             cursor: pointer;
@@ -75,7 +75,7 @@
 
         .btn-signup:hover {
             background-color: #42d3a5;
-            color: #1e2530; /* При наведении текст становится темным */
+            color: #1e2530;
         }
 
         .btn-login {
@@ -88,22 +88,12 @@
             color: #ffffff;
         }
 
-        /* Декоративная штриховая линия */
-        .divider {
-            width: 100%;
-            height: 4px;
-            background-image: linear-gradient(to right, #ffffff 50%, transparent 50%);
-            background-size: 24px 4px;
-            margin-bottom: 40px;
-            opacity: 0.9;
-        }
-
-        /* Контейнер */
+        /* Главный контейнер */
         .main-container {
             max-width: 1300px;
             width: 100%;
             margin: 15px auto;
-            padding: 0 30px 40px 30px;
+            padding: 50px 30px 40px 30px; /* Отступ сверху вместо удаленного штриха */
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -129,14 +119,13 @@
         }
 
         /* Поле ввода промпта */
-        /* Поле ввода промпта */
         .generator-box {
             display: flex;
             width: 100%;
             max-width: 600px;
             gap: 12px;
             margin-bottom: 45px;
-            align-items: center; /* Выравнивает кнопку строго по центру относительно высоты инпута */
+            align-items: center;
         }
 
         .prompt-wrapper {
@@ -157,7 +146,7 @@
             resize: none;
             outline: none;
             overflow-y: auto;
-            display: block; /* Убирает лишние инлайновые отступы снизу */
+            display: block;
         }
 
         .btn-generate {
@@ -170,7 +159,7 @@
             cursor: pointer;
             font-family: inherit;
             height: 42px;
-            white-space: nowrap; /* Запрещает тексту внутри кнопки переноситься */
+            white-space: nowrap;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -182,17 +171,17 @@
             color: #ffffff;
         }
 
-        /* Сетка колонок */
+        /* Сетка колонок редактора */
         .editors-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 25px;
             width: 100%;
-            flex-grow: 1;
+            margin-bottom: 50px;
         }
 
         .editor-column {
-            background-color: #2b3444; /* Цвет блоков из макета */
+            background-color: #2b3444; 
             border: 1px solid #141921;
             border-radius: 4px;
             display: flex;
@@ -240,10 +229,88 @@
             flex-grow: 1;
             padding: 15px;
             overflow-y: auto;
-            height: 500px;
+            height: 400px;
         }
 
-        /* Скроллбары */
+        /* Секция интерактивного превью (Второй макет) */
+        .preview-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .preview-title {
+            font-size: 22px;
+            font-weight: 400;
+            margin: 0 0 15px 0;
+            color: #ffffff;
+        }
+
+        .browser-mockup {
+            width: 100%;
+            height: 550px;
+            background-color: #2b3444;
+            border: 3px solid #52a3e1; /* Яркая синяя рамка вокруг превью */
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .browser-header {
+            background-color: #202733;
+            padding: 10px 20px;
+            border-bottom: 2px solid #141921;
+        }
+
+        .browser-url {
+            color: #52a3e1;
+            font-size: 14px;
+            text-decoration: underline;
+            user-select: none;
+        }
+
+        .browser-body {
+            flex-grow: 1;
+            position: relative;
+            background-color: #2b3444;
+        }
+
+        /* Текст No Design наискосок */
+        .no-design-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 90px;
+            font-weight: 700;
+            color: #ffffff;
+            transform: rotate(-25deg); /* Поворот текста */
+            user-select: none;
+            pointer-events: none;
+            z-index: 5;
+            letter-spacing: 2px;
+        }
+
+        /* Скрытый по умолчанию фрейм для рендеринга */
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #ffffff; /* Белый фон для создаваемого сайта */
+            display: none;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Кастомные скроллбары */
         .editor-body::-webkit-scrollbar,
         .prompt-input::-webkit-scrollbar {
             width: 14px;
@@ -266,7 +333,7 @@
         }
 
         .line-numbers {
-            color: #52a3e1; /* Голубые номера строк */
+            color: #52a3e1; 
             text-align: right;
             padding-right: 15px;
             user-select: none;
@@ -282,12 +349,25 @@
             width: 100%;
         }
 
+        /* Чёрный Футер (Без штриха) */
+        footer {
+            background-color: #000000;
+            width: 100%;
+            padding: 20px 30px;
+            text-align: left; /* Выравнивание влево */
+            font-size: 14px;
+            color: #437199; /* Синеватый оттенок шрифта версии */
+        }
+
         @media (max-width: 950px) {
             .editors-grid {
                 grid-template-columns: 1fr;
             }
             .editor-body {
-                height: 350px;
+                height: 300px;
+            }
+            .no-design-placeholder {
+                font-size: 50px;
             }
         }
     </style>
@@ -364,17 +444,34 @@
                 </div>
             </div>
         </div>
+
+        <div class="preview-section">
+            <h2 class="preview-title">Preview design</h2>
+            <div class="browser-mockup">
+                <div class="browser-header">
+                    <span class="browser-url">https://example.com</span>
+                </div>
+                <div class="browser-body">
+                    <div class="no-design-placeholder" id="noDesignText">No Design</div>
+                    <iframe class="preview-iframe" id="livePreview"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <footer>
+        <div class="version-text">Version 0.1</div>
+    </footer>
+
     <script>
-        // Динамическое изменение высоты ввода промпта
+        // Динамическое изменение высоты инпута
         const promptInput = document.getElementById('promptInput');
         promptInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
         });
 
-        // Расчет и отрисовка номеров строк
+        // Функция обновления номеров строк
         function updateLineNumbers(codeId, linesId) {
             const codeContent = document.getElementById(codeId);
             const linesContainer = document.getElementById(linesId);
@@ -388,23 +485,74 @@
             linesContainer.innerHTML = linesHtml;
         }
 
+        // Функция сборки кода из колонок и вывода в Live Preview
+        function renderLiveCode() {
+            const html = document.getElementById('htmlCode').innerText;
+            const css = document.getElementById('cssCode').innerText;
+            const js = document.getElementById('jsCode').innerText;
+            
+            const iframe = document.getElementById('livePreview');
+            const placeholder = document.getElementById('noDesignText');
+            
+            // Если в полях пусто или базовые три точки — показываем заглушку No Design
+            if ((html === '...' || html.trim() === '') && 
+                (css === '...' || css.trim() === '') && 
+                (js === '...' || js.trim() === '')) {
+                iframe.style.display = 'none';
+                placeholder.style.display = 'flex';
+                return;
+            }
+            
+            // Иначе прячем текст и включаем отображение сайта внутри фрейма
+            placeholder.style.display = 'none';
+            iframe.style.display = 'block';
+            
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(`
+                <!DOCTYPE html>
+                <html lang="ru">
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { margin: 15px; font-family: sans-serif; color: #333; }
+                        ${css}
+                    </style>
+                </head>
+                <body>
+                    ${html}
+                    <script>${js}<\/script>
+                </body>
+                </html>
+            `);
+            iframeDoc.close();
+        }
+
+        // Назначаем слежение за вводом текста (чтобы превью обновлялось на лету при изменении кода)
         ['htmlCode', 'cssCode', 'jsCode'].forEach(id => {
             const el = document.getElementById(id);
             const linesId = id.replace('Code', 'Lines');
-            el.addEventListener('input', () => updateLineNumbers(id, linesId));
+            
+            el.addEventListener('input', () => {
+                updateLineNumbers(id, linesId);
+                renderLiveCode();
+            });
         });
 
-        // Имитация генерации по клику на Generate
+        // Кнопка ИИ-Генерации
         document.getElementById('generateBtn').addEventListener('click', () => {
             if(!promptInput.value.trim()) return;
             
-            document.getElementById('htmlCode').innerText = `\n<div class="container">\n  <h1>Overpass Mono подключен</h1>\n  <p>Все блоки синхронизированы.</p>\n</div>`;
-            document.getElementById('cssCode').innerText = `/* Оформление базовых стилей */\n.container {\n  padding: 20px;\n  text-align: center;\n}`;
-            document.getElementById('jsCode').innerText = `console.log("Интерфейс полностью готов к интеграции.");`;
+            // Имитируем заполнение полей сгенерированным кодом
+            document.getElementById('htmlCode').innerText = `<div class="welcome-card">\n  <h2>🎨 Твой дизайн готов!</h2>\n  <p>Этот блок сгенерирован автоматически и отрендерился внутри фрейма в реальном времени.</p>\n  <button id="alertBtn">Проверить JS</button>\n</div>`;
+            document.getElementById('cssCode').innerText = `.welcome-card {\n  background: linear-gradient(135deg, #42d3a5, #386280);\n  padding: 30px;\n  border-radius: 12px;\n  color: #fff;\n  text-align: center;\n  box-shadow: 0 8px 16px rgba(0,0,0,0.1);\n}\nbutton {\n  background: #fff;\n  border: none;\n  padding: 10px 20px;\n  border-radius: 6px;\n  font-weight: bold;\n  cursor: pointer;\n  color: #1e2530;\n}`;
+            document.getElementById('jsCode').innerText = `const btn = document.getElementById('alertBtn');\nbtn.addEventListener('click', () => {\n  alert('Интерактив тоже работает!');\n});`;
             
+            // Синхронно пересчитываем строки и запускаем рендеринг
             updateLineNumbers('htmlCode', 'htmlLines');
             updateLineNumbers('cssCode', 'cssLines');
             updateLineNumbers('jsCode', 'jsLines');
+            renderLiveCode();
         });
 
         function copyCode(id) {
