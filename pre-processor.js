@@ -1,8 +1,6 @@
-// refiner.js - Универсальный автономный модуль для перефразирования промптов с цензурой
 (function (global) {
     'use strict';
 
-    // Вставь сюда свой проверенный ключ OpenRouter
     const SHARED_API_KEY = "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";
 
     const SYSTEM_PROMPT = `Ты — ведущий UI/UX архитектор. Твоя цель — преобразовать идею пользователя в технический промпт для генерации дизайна.
@@ -14,15 +12,8 @@
 4. Ограничение вывода: Выводи ТОЛЬКО готовый текст промпта без приветствий, вступлений, кавычек вокруг результата и твоих личных комментариев.`;
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
-
-    /**
-     * Универсальная функция для улучшения промпта
-     * @param {string} text - Исходный текст пользователя (возможно с матом)
-     * @param {function} [onStatusUpdate] - Опциональный колбэк для отслеживания статуса в UI (передает строку)
-     * @returns {Promise<{success: boolean, result?: string, error?: string}>}
-     */
+    
     async function generateRefinedPrompt(text, onStatusUpdate = () => {}) {
-        // Твой оригинальный список моделей без изменений
         const models = [
             'meta-llama/llama-3.2-3b-instruct:free',
             'deepseek/deepseek-v4-flash:free',
@@ -31,7 +22,7 @@
         ];
 
         const startTime = Date.now();
-        const timeoutDuration = 30000; // 30 секунд максимум на весь перебор
+        const timeoutDuration = 30000;
         let success = false;
         let attemptCount = 1;
         let lastFailureReason = "";
@@ -51,7 +42,6 @@
                 const timeLeft = Math.round((timeoutDuration - (Date.now() - startTime)) / 1000);
                 const statusMsg = `Попытка [Круг ${attemptCount}] | Модель: ${currentModel.split('/')[1]} | Осталось: ${timeLeft} сек...`;
                 
-                // Передаем статус наружу, если проект хочет его отображать
                 onStatusUpdate(statusMsg);
 
                 try {
@@ -73,7 +63,6 @@
                         })
                     });
 
-                    // Если токен невалиден — сразу выводим жесткую ошибку в консоль
                     if (response.status === 401) {
                         isAuthError = true;
                         throw new Error("401 Unauthorized: Неверный API-ключ OpenRouter. Проверьте строку SHARED_API_KEY в refiner.js.");
@@ -96,7 +85,6 @@
 
                 } catch (error) {
                     lastFailureReason = error.message;
-                    // Пишем все внутренние сбои моделей как предупреждения в консоль
                     console.warn(`PromptRefiner [Предупреждение]: Модель ${currentModel} на круге ${attemptCount} выдала ошибку -> ${error.message}`);
                     
                     if (isAuthError) {
@@ -117,7 +105,6 @@
         return { success: false, error: lastFailureReason };
     }
 
-    // Экспортируем функцию в глобальную область видимости (window), чтобы её подхватил любой скрипт
     global.generateRefinedPrompt = generateRefinedPrompt;
 
 })(typeof window !== 'undefined' ? window : this);
