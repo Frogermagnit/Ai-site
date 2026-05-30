@@ -92,7 +92,7 @@
             max-width: 1300px;
             width: 100%;
             margin: 0 auto;
-            padding: 40px 30px 40px 30px; 
+            padding: 40px 30px; 
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -165,9 +165,28 @@
             transition: all 0.2s;
         }
 
-        .btn-generate:hover {
+        .btn-generate:hover:not(:disabled) {
             border-color: #ffffff;
             color: #ffffff;
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: #3b4856;
+            color: #59687a;
+        }
+
+        /* Статус-бар под генератором */
+        .status-bar {
+            font-size: 13px;
+            color: #52a3e1;
+            margin-top: -35px;
+            margin-bottom: 35px;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            min-height: 18px;
         }
 
         /* Сетка колонок редактора */
@@ -231,7 +250,7 @@
             height: 400px;
         }
 
-        /* Секция интерактивного превью (Второй макет) */
+        /* Секция интерактивного превью */
         .preview-section {
             width: 100%;
             display: flex;
@@ -261,7 +280,7 @@
 
         .browser-header {
             background-color: #202733;
-            padding: 10px 10px;
+            padding: 10px;
             border-bottom: 2px solid #141921;
         }
 
@@ -395,10 +414,12 @@
             <button class="btn-generate" id="generateBtn">Generate</button>
         </div>
 
+        <div id="statusMessage" class="status-bar"></div>
+
         <div class="editors-grid">
             <div class="editor-column">
                 <div class="editor-header">
-                    <span class="editor-title html">HTML</span>
+                    <span class="editor-title html">HTML (Refined Prompt)</span>
                     <button class="copy-btn" onclick="copyCode('htmlCode')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
@@ -460,13 +481,21 @@
         <div class="version-text">Version 0.1</div>
     </footer>
 
+    <script src="refiner.js"></script>
+
     <script>
         const promptInput = document.getElementById('promptInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const htmlCodeContainer = document.getElementById('htmlCode');
+
+        // Автоматическое увеличение высоты текстового поля при вводе
         promptInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
         });
 
+        // Функция подсчета строк
         function updateLineNumbers(codeId, linesId) {
             const codeContent = document.getElementById(codeId);
             const linesContainer = document.getElementById(linesId);
@@ -480,6 +509,7 @@
             linesContainer.innerHTML = linesHtml;
         }
 
+        // Рендеринг live-превью во фрейме
         function renderLiveCode() {
             const html = document.getElementById('htmlCode').innerText;
             const css = document.getElementById('cssCode').innerText;
@@ -520,6 +550,7 @@
             iframeDoc.close();
         }
 
+        // Отслеживание изменений во всех колонках
         ['htmlCode', 'cssCode', 'jsCode'].forEach(id => {
             const el = document.getElementById(id);
             const linesId = id.replace('Code', 'Lines');
@@ -530,17 +561,42 @@
             });
         });
 
-        document.getElementById('generateBtn').addEventListener('click', () => {
-            if(!promptInput.value.trim()) return;
+        // ИНТЕГРАЦИЯ REFINER.JS ПРИ НАЖАТИИ НА КНОПКУ GENERATE
+        generateBtn.addEventListener('click', async () => {
+            const rawText = promptInput.value.trim();
+            if (!rawText) return;
+
+            // Блокируем кнопку и очищаем прошлый статус
+            generateBtn.disabled = true;
+            statusMessage.textContent = "Инициализация...";
             
-            document.getElementById('htmlCode').innerText = `<div class="welcome-card">\n  <h2>Preview Design</h2>\n  <p>Generated in real time</p>\n  <button id="alertBtn">Check JS</button>\n</div>`;
-            document.getElementById('cssCode').innerText = `.welcome-card {\n  background: linear-gradient(135deg, #42d3a5, #386280);\n  padding: 30px;\n  border-radius: 12px;\n  color: #fff;\n  text-align: center;\n  box-shadow: 0 8px 16px rgba(0,0,0,0.1);\n}\nbutton {\n  background: #fff;\n  border: none;\n  padding: 10px 20px;\n  border-radius: 6px;\n  font-weight: bold;\n  cursor: pointer;\n  color: #1e2530;\n}`;
-            document.getElementById('jsCode').innerText = `const btn = document.getElementById('alertBtn');\nbtn.addEventListener('click', () => {\n  alert('Button work');\n});`;
-            
-            updateLineNumbers('htmlCode', 'htmlLines');
+            // Очищаем CSS и JS колонки, так как мы пишем промпт в HTML
+            document.getElementById('cssCode').innerText = '';
+            document.getElementById('jsCode').innerText = '';
             updateLineNumbers('cssCode', 'cssLines');
             updateLineNumbers('jsCode', 'jsLines');
+
+            // Вызываем глобальную автономную функцию из refiner.js
+            const response = await window.generateRefinedPrompt(rawText, (statusText) => {
+                statusMessage.textContent = statusText; // Передаем шаги перебора в наш статус-бар
+            });
+
+            if (response.success) {
+                // Записываем очищенный перефразированный промпт в ПЕРВУЮ колонку (HTML)
+                htmlCodeContainer.innerText = response.result;
+                statusMessage.textContent = "Готово. Промпт оптимизирован и очищен.";
+            } else {
+                // Если произошел сбой, выводим ошибку, подробности будут в F12
+                htmlCodeContainer.innerText = `[Ошибка генерации]: ${response.error}`;
+                statusMessage.textContent = `Ошибка: Не удалось получить ответ.`;
+            }
+
+            // Обновляем номера строк и перезапускаем превью фрейма
+            updateLineNumbers('htmlCode', 'htmlLines');
             renderLiveCode();
+            
+            // Разблокируем кнопку обратно
+            generateBtn.disabled = false;
         });
 
         function copyCode(id) {
