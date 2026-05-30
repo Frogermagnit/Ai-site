@@ -87,7 +87,6 @@
             color: #ffffff;
         }
 
-        /* Главный контейнер */
         .main-container {
             max-width: 1300px;
             width: 100%;
@@ -176,8 +175,7 @@
             border-color: #3b4856;
             color: #59687a;
         }
-
-        /* Статус-бар под генератором */
+        
         .status-bar {
             font-size: 13px;
             color: #52a3e1;
@@ -189,7 +187,6 @@
             min-height: 18px;
         }
 
-        /* Сетка колонок редактора */
         .editors-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -316,7 +313,6 @@
             letter-spacing: 2px;
         }
 
-        /* Скрытый по умолчанию фрейм для рендеринга */
         .preview-iframe {
             width: 100%;
             height: 100%;
@@ -419,7 +415,7 @@
         <div class="editors-grid">
             <div class="editor-column">
                 <div class="editor-header">
-                    <span class="editor-title html">HTML (Refined Prompt)</span>
+                    <span class="editor-title html">HTML (Промпт ТЕСТ)</span>
                     <button class="copy-btn" onclick="copyCode('htmlCode')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
@@ -509,7 +505,6 @@
             linesContainer.innerHTML = linesHtml;
         }
 
-        // Рендеринг live-превью во фрейме
         function renderLiveCode() {
             const html = document.getElementById('htmlCode').innerText;
             const css = document.getElementById('cssCode').innerText;
@@ -561,41 +556,33 @@
             });
         });
 
-        // ИНТЕГРАЦИЯ REFINER.JS ПРИ НАЖАТИИ НА КНОПКУ GENERATE
         generateBtn.addEventListener('click', async () => {
             const rawText = promptInput.value.trim();
             if (!rawText) return;
 
-            // Блокируем кнопку и очищаем прошлый статус
             generateBtn.disabled = true;
             statusMessage.textContent = "Инициализация...";
             
-            // Очищаем CSS и JS колонки, так как мы пишем промпт в HTML
             document.getElementById('cssCode').innerText = '';
             document.getElementById('jsCode').innerText = '';
             updateLineNumbers('cssCode', 'cssLines');
             updateLineNumbers('jsCode', 'jsLines');
 
-            // Вызываем глобальную автономную функцию из refiner.js
             const response = await window.generateRefinedPrompt(rawText, (statusText) => {
-                statusMessage.textContent = statusText; // Передаем шаги перебора в наш статус-бар
+                statusMessage.textContent = statusText; 
             });
 
             if (response.success) {
-                // Записываем очищенный перефразированный промпт в ПЕРВУЮ колонку (HTML)
                 htmlCodeContainer.innerText = response.result;
                 statusMessage.textContent = "Готово. Промпт оптимизирован и очищен.";
             } else {
-                // Если произошел сбой, выводим ошибку, подробности будут в F12
                 htmlCodeContainer.innerText = `[Ошибка генерации]: ${response.error}`;
                 statusMessage.textContent = `Ошибка: Не удалось получить ответ.`;
             }
 
-            // Обновляем номера строк и перезапускаем превью фрейма
             updateLineNumbers('htmlCode', 'htmlLines');
             renderLiveCode();
             
-            // Разблокируем кнопку обратно
             generateBtn.disabled = false;
         });
 
