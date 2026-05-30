@@ -3,7 +3,7 @@
     'use strict';
 
     // Вставь сюда свой проверенный ключ OpenRouter
-    const SHARED_API_KEY = "СЮДА_ВСТАВЬ_ТВОЙ_ОБЩИЙ_OPENROUTER_КЛЮЧ";
+    const SHARED_API_KEY = "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";
 
     const SYSTEM_PROMPT = `Ты — ведущий UI/UX архитектор. Твоя цель — преобразовать идею пользователя в технический промпт для генерации дизайна.
 
