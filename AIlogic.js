@@ -9,8 +9,16 @@ const WORKER_URL = "https://groq-proxy-assistant.matvey-bogdanchik10.workers.dev
 // Минимальное количество слов для отправки
 const MIN_WORDS_COUNT = 5;
 
+function cleanCode(str) {
+    if (!str) return '';
+    return str
+        .replace(/^```(json|html|css|javascript|js)?/gi, '')
+        .replace(/```$/gi, '')
+        .trim();
+}
+
 /**
- * Вспомогательная функция подсчета слов
+ * Подсчет слов в строке
  */
 function countWords(str) {
     return str.trim().split(/\s+/).filter(word => word.length > 0).length;
@@ -31,9 +39,9 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
 
     try {
         // ----------------------------------------------------
-        // ЭТАП 1: Оптимизация промпта (генерация короткого ТЗ)
+        // ЭТАП 1: Создание детального UI/UX Технического Задания
         // ----------------------------------------------------
-        if (onStatusChange) onStatusChange("Оптимизация промпта...");
+        if (onStatusChange) onStatusChange("Анализ запроса и проектирование UI/UX...");
 
         const step1Response = await fetch(WORKER_URL, {
             method: "POST",
@@ -43,7 +51,7 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
                 messages: [
                     {
                         role: "system",
-                        content: "Ты — эксперт по Prompt Engineering. Преобразуй описание сайта от пользователя в КОРОТКОЕ лаконичное техническое задание (максимум 150-200 слов). Опиши только структуру, стили и функции. Без вводных фраз."
+                        content: "Ты — Senior Prompt Engineer и Lead UI/UX Designer. Преобразуй запрос пользователя в лаконичное ТЗ для верстки (до 200 слов). Опиши: 1) Структуру блоков (header, hero, features, footer). 2) Современную цветовую палитру и стиль. 3) Интерактивные элементы и поведение JS."
                     },
                     {
                         role: "user",
@@ -51,29 +59,28 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
                     }
                 ],
                 temperature: 0.5,
-                max_completion_tokens: 500
+                max_completion_tokens: 600
             })
         });
 
         if (!step1Response.ok) {
             const errData = await step1Response.json().catch(() => ({}));
             const msg = errData.error?.message || `Код ошибки: ${step1Response.status}`;
-            throw new Error(`Ошибка на этапе оптимизации: ${msg}`);
+            throw new Error(`Ошибка на этапе проектирования: ${msg}`);
         }
 
         const step1Data = await step1Response.json();
-        const refinedPrompt = step1Data.choices?.[0]?.message?.content;
+        const refinedPrompt = cleanCode(step1Data.choices?.[0]?.message?.content);
 
         if (!refinedPrompt) {
-            throw new Error("Не удалось перефразировать промпт.");
+            throw new Error("Не удалось сформулировать ТЗ.");
         }
 
         // ----------------------------------------------------
-        // ЭТАП 2: Генерация HTML, CSS и JS
+        // ЭТАП 2: Генерация современно сверстанного кода (HTML, CSS, JS)
         // ----------------------------------------------------
-        if (onStatusChange) onStatusChange("Генерация кода (HTML, CSS, JS)...");
+        if (onStatusChange) onStatusChange("Генерация HTML, CSS и JS...");
 
-        // Безопасная обрезка ТЗ, если оно получилось слишком длинным
         const safePrompt = refinedPrompt.length > 3000 ? refinedPrompt.slice(0, 3000) : refinedPrompt;
 
         const step2Response = await fetch(WORKER_URL, {
@@ -85,10 +92,16 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
                 messages: [
                     {
                         role: "system",
-                        content: `Ты — Senior Frontend Developer. Напиши верстку и скрипты по ТЗ.
-Верни результат СТРОГО в формате JSON:
+                        content: `Ты — Senior Frontend Developer & UI/UX Expert. Напиши современный, премиальный и адаптивный сайт по ТЗ.
+
+СТРОГИЕ ТРЕБОВАНИЯ К КОДУ:
+1. HTML: Семантический код без inline-стилей. Если нужны иконки, используй теги Lucide Icons: <i data-lucide="имя-иконки"></i>.
+2. CSS: Используй CSS-переменные (:root), Flexbox/Grid, медиазапросы для мобильных устройств, стильные hover-эффекты, мягкие тени и плавные transitions.
+3. JS: Добавь полноценную интерактивность (работа кнопок, модальные окна, анимации или мобильное меню). Если использовал иконки, обязательно добавь инициализацию: lucide.createIcons();
+
+Верни результат СТРОГО в виде валидного JSON-объекта без Markdown:
 {
-  "html": "код внутренних тегов страницы без html, head, body",
+  "html": "код внутри body",
   "css": "стили CSS",
   "javascript": "скрипт JS"
 }`
@@ -110,26 +123,27 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
         }
 
         const step2Data = await step2Response.json();
-        const rawContent = step2Data.choices?.[0]?.message?.content;
+        const rawContent = cleanCode(step2Data.choices?.[0]?.message?.content);
 
         let parsedCode;
         try {
             parsedCode = JSON.parse(rawContent);
         } catch (e) {
+            // Резервное извлечение JSON из строки
             const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
                 parsedCode = JSON.parse(jsonMatch[0]);
             } else {
-                throw new Error("Не удалось распарсить JSON с кодом.");
+                throw new Error("Не удалось разобрать сгенерированный JSON.");
             }
         }
 
         return {
             success: true,
             refinedPrompt: refinedPrompt,
-            html: parsedCode.html || '',
-            css: parsedCode.css || '',
-            js: parsedCode.javascript || parsedCode.js || ''
+            html: cleanCode(parsedCode.html),
+            css: cleanCode(parsedCode.css),
+            js: cleanCode(parsedCode.javascript || parsedCode.js)
         };
 
     } catch (error) {
