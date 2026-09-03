@@ -22,17 +22,16 @@ function countWords(str) {
 window.generateWebsite = async function (userPrompt, onStatusChange) {
     const wordCount = countWords(userPrompt);
 
-    // Валидация минимального количества слов
     if (wordCount < MIN_WORDS_COUNT) {
         return {
             success: false,
-            error: `Слишком короткий запрос. Введите минимум ${MIN_WORDS_COUNT} слова (сейчас: ${wordCount}).`
+            error: `Слишком короткий запрос. Введите минимум ${MIN_WORDS_COUNT} слова.`
         };
     }
 
     try {
         // ----------------------------------------------------
-        // ЭТАП 1: Оптимизация промпта
+        // ЭТАП 1: Оптимизация промпта (генерация короткого ТЗ)
         // ----------------------------------------------------
         if (onStatusChange) onStatusChange("Оптимизация промпта...");
 
@@ -44,34 +43,38 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
                 messages: [
                     {
                         role: "system",
-                        content: "Ты — эксперт по Prompt Engineering. Преобразуй описание сайта от пользователя в детальное техническое задание для верстальщика. Опиши структуру, элементы, стилистику и функционал. Отвечай кратко и конкретно, без вводных слов."
+                        content: "Ты — эксперт по Prompt Engineering. Преобразуй описание сайта от пользователя в КОРОТКОЕ лаконичное техническое задание (максимум 150-200 слов). Опиши только структуру, стили и функции. Без вводных фраз."
                     },
                     {
                         role: "user",
                         content: userPrompt
                     }
                 ],
-                temperature: 0.5
+                temperature: 0.5,
+                max_completion_tokens: 500
             })
         });
 
         if (!step1Response.ok) {
             const errData = await step1Response.json().catch(() => ({}));
-            const detailMsg = errData.error?.message || `Статус: ${step1Response.status}`;
-            throw new Error(`Ошибка Groq API (${step1Response.status}): ${detailMsg}`);
+            const msg = errData.error?.message || `Код ошибки: ${step1Response.status}`;
+            throw new Error(`Ошибка на этапе оптимизации: ${msg}`);
         }
 
         const step1Data = await step1Response.json();
-        const refinedPrompt = step1Data.choices[0]?.message?.content;
+        const refinedPrompt = step1Data.choices?.[0]?.message?.content;
 
         if (!refinedPrompt) {
-            throw new Error("Не удалось оптимизировать промпт.");
+            throw new Error("Не удалось перефразировать промпт.");
         }
 
         // ----------------------------------------------------
         // ЭТАП 2: Генерация HTML, CSS и JS
         // ----------------------------------------------------
         if (onStatusChange) onStatusChange("Генерация кода (HTML, CSS, JS)...");
+
+        // Безопасная обрезка ТЗ, если оно получилось слишком длинным
+        const safePrompt = refinedPrompt.length > 3000 ? refinedPrompt.slice(0, 3000) : refinedPrompt;
 
         const step2Response = await fetch(WORKER_URL, {
             method: "POST",
@@ -82,31 +85,33 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
                 messages: [
                     {
                         role: "system",
-                        content: `Ты — Senior Frontend Developer. Напиши современную верстку и логику сайта по ТЗ.
-Верни результат СТРОГО в формате валидного JSON-объекта без разметки markdown (без \`\`\`json):
+                        content: `Ты — Senior Frontend Developer. Напиши верстку и скрипты по ТЗ.
+Верни результат СТРОГО в формате JSON:
 {
-  "html": "верстка внутренних элементов без тегов html, head, body",
+  "html": "код внутренних тегов страницы без html, head, body",
   "css": "стили CSS",
-  "javascript": "код JavaScript"
+  "javascript": "скрипт JS"
 }`
                     },
                     {
                         role: "user",
-                        content: refinedPrompt
+                        content: safePrompt
                     }
                 ],
-                temperature: 0.3
+                temperature: 0.3,
+                max_completion_tokens: 4000
             })
         });
 
         if (!step2Response.ok) {
-            throw new Error(`Ошибка сети на этапе генерации кода (${step2Response.status})`);
+            const errData = await step2Response.json().catch(() => ({}));
+            const msg = errData.error?.message || `Код ошибки: ${step2Response.status}`;
+            throw new Error(`Ошибка на этапе генерации кода: ${msg}`);
         }
 
         const step2Data = await step2Response.json();
-        const rawContent = step2Data.choices[0]?.message?.content;
+        const rawContent = step2Data.choices?.[0]?.message?.content;
 
-        // Извлечение JSON
         let parsedCode;
         try {
             parsedCode = JSON.parse(rawContent);
@@ -115,7 +120,7 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
             if (jsonMatch) {
                 parsedCode = JSON.parse(jsonMatch[0]);
             } else {
-                throw new Error("Ошибка обработки ответа ИИ.");
+                throw new Error("Не удалось распарсить JSON с кодом.");
             }
         }
 
@@ -124,14 +129,14 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
             refinedPrompt: refinedPrompt,
             html: parsedCode.html || '',
             css: parsedCode.css || '',
-            js: parsedCode.javascript || ''
+            js: parsedCode.javascript || parsedCode.js || ''
         };
 
     } catch (error) {
         console.error("AI Generation Error:", error);
         return {
             success: false,
-            error: error.message || "Ошибка подключения к серверу ИИ."
+            error: error.message || "Ошибка соединения."
         };
     }
 };
