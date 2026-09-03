@@ -4,7 +4,7 @@
  */
 
 // Укажите ваш URL Cloudflare Worker
-const WORKER_URL = "https://groq-proxy-assistant.matvey-bogdanchik10.workers.dev"; // <-- ЗАМЕНИТЕ НА ВАШ URL
+const WORKER_URL = "https://groq-proxy-assistant.matvey-bogdanchik10.workers.dev/"; // <-- ЗАМЕНИТЕ НА ВАШ URL
 
 // Минимальное количество слов для отправки
 const MIN_WORDS_COUNT = 5;
