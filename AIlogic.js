@@ -87,7 +87,7 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                model: "openai/gpt-oss-120b",
+                model: "groq/compound",
                 response_format: { type: "json_object" },
                 messages: [
                     {
