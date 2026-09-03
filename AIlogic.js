@@ -123,18 +123,42 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
         }
 
         const step2Data = await step2Response.json();
-        const rawContent = cleanCode(step2Data.choices?.[0]?.message?.content);
+        let rawContent = step2Data.choices?.[0]?.message?.content || "";
 
-        let parsedCode;
+        let parsedCode = { html: "", css: "", javascript: "" };
+
+        // 1. Попытка стандартного JSON.parse
         try {
-            parsedCode = JSON.parse(rawContent);
+            // Очищаем от возможных Markdown-оберток ```json
+            const cleanedRaw = rawContent
+                .replace(/^```(json)?/gi, '')
+                .replace(/```$/gi, '')
+                .trim();
+
+            parsedCode = JSON.parse(cleanedRaw);
         } catch (e) {
-            // Резервное извлечение JSON из строки
-            const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                parsedCode = JSON.parse(jsonMatch[0]);
-            } else {
-                throw new Error("Не удалось разобрать сгенерированный JSON.");
+            console.warn("Стандартный JSON.parse не справился, включаем аварийный извлекатель...", e);
+
+            // 2. Аварийное извлечение регулярными выражениями, если JSON "сломан"
+            const extractKey = (keyName) => {
+                const regex = new RegExp(`"${keyName}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*\\})`, 'i');
+                const match = rawContent.match(regex);
+                if (match && match[1]) {
+                    return match[1]
+                        .replace(/\\n/g, '\n')
+                        .replace(/\\"/g, '"')
+                        .replace(/\\\\/g, '\\');
+                }
+                return '';
+            };
+
+            parsedCode.html = extractKey('html');
+            parsedCode.css = extractKey('css');
+            parsedCode.javascript = extractKey('javascript') || extractKey('js');
+
+            // Если даже регулярки ничего не нашли, отдаем весь ответ в HTML
+            if (!parsedCode.html && !parsedCode.css && !parsedCode.javascript) {
+                parsedCode.html = rawContent;
             }
         }
 
