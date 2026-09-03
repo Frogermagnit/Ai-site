@@ -56,7 +56,9 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
         });
 
         if (!step1Response.ok) {
-            throw new Error(`Ошибка сети на этапе оптимизации (${step1Response.status})`);
+            const errData = await step1Response.json().catch(() => ({}));
+            const detailMsg = errData.error?.message || `Статус: ${step1Response.status}`;
+            throw new Error(`Ошибка Groq API (${step1Response.status}): ${detailMsg}`);
         }
 
         const step1Data = await step1Response.json();
