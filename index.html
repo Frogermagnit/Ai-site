@@ -122,7 +122,7 @@
             width: 100%;
             max-width: 600px;
             gap: 12px;
-            margin-bottom: 45px;
+            margin-bottom: 8px;
             align-items: center;
         }
 
@@ -145,6 +145,16 @@
             outline: none;
             overflow-y: auto;
             display: block;
+        }
+
+        .word-hint {
+            width: 100%;
+            max-width: 600px;
+            text-align: left;
+            font-size: 12px;
+            color: #59687a;
+            margin-bottom: 35px;
+            padding-left: 5px;
         }
 
         .btn-generate {
@@ -179,7 +189,6 @@
         .status-bar {
             font-size: 13px;
             color: #52a3e1;
-            margin-top: -35px;
             margin-bottom: 35px;
             text-align: center;
             width: 100%;
@@ -409,13 +418,14 @@
             </div>
             <button class="btn-generate" id="generateBtn">Generate</button>
         </div>
+        <div class="word-hint" id="wordHint">Min 3 words</div>
 
         <div id="statusMessage" class="status-bar"></div>
 
         <div class="editors-grid">
             <div class="editor-column">
                 <div class="editor-header">
-                    <span class="editor-title html">HTML (Промпт ТЕСТ)</span>
+                    <span class="editor-title html">HTML</span>
                     <button class="copy-btn" onclick="copyCode('htmlCode')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     </button>
@@ -477,18 +487,28 @@
         <div class="version-text">Version 0.1</div>
     </footer>
 
-    <script src="pre-processor.js"></script>
+    <!-- Подключаем обновленную логику ИИ -->
+    <script src="AIlogic.js"></script>
 
     <script>
         const promptInput = document.getElementById('promptInput');
         const generateBtn = document.getElementById('generateBtn');
         const statusMessage = document.getElementById('statusMessage');
-        const htmlCodeContainer = document.getElementById('htmlCode');
+        const wordHint = document.getElementById('wordHint');
 
-        // Автоматическое увеличение высоты текстового поля при вводе
+        // Автоматическое увеличение высоты текстового поля и отслеживание слов
         promptInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
+
+            const words = this.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+            if (words < 3) {
+                wordHint.style.color = '#e74c3c';
+                wordHint.textContent = `Min 3 words (current: ${words})`;
+            } else {
+                wordHint.style.color = '#42d3a5';
+                wordHint.textContent = `Words: ${words}`;
+            }
         });
 
         // Функция подсчета строк
@@ -505,6 +525,7 @@
             linesContainer.innerHTML = linesHtml;
         }
 
+        // Рендер живого превью
         function renderLiveCode() {
             const html = document.getElementById('htmlCode').innerText;
             const css = document.getElementById('cssCode').innerText;
@@ -545,7 +566,7 @@
             iframeDoc.close();
         }
 
-        // Отслеживание изменений во всех колонках
+        // Отслеживание ручных изменений во всех трех редакторах
         ['htmlCode', 'cssCode', 'jsCode'].forEach(id => {
             const el = document.getElementById(id);
             const linesId = id.replace('Code', 'Lines');
@@ -556,31 +577,33 @@
             });
         });
 
+        // Запуск генерации ИИ
         generateBtn.addEventListener('click', async () => {
             const rawText = promptInput.value.trim();
             if (!rawText) return;
 
             generateBtn.disabled = true;
             statusMessage.textContent = "Инициализация...";
-            
-            document.getElementById('cssCode').innerText = '';
-            document.getElementById('jsCode').innerText = '';
-            updateLineNumbers('cssCode', 'cssLines');
-            updateLineNumbers('jsCode', 'jsLines');
 
-            const response = await window.generateRefinedPrompt(rawText, (statusText) => {
+            const response = await window.generateWebsite(rawText, (statusText) => {
                 statusMessage.textContent = statusText; 
             });
 
             if (response.success) {
-                htmlCodeContainer.innerText = response.result;
-                statusMessage.textContent = "Готово. Промпт оптимизирован и очищен.";
+                // Вставляем сгенерированный код по колонкам
+                document.getElementById('htmlCode').innerText = response.html;
+                document.getElementById('cssCode').innerText = response.css;
+                document.getElementById('jsCode').innerText = response.js;
+
+                statusMessage.textContent = "Готово! Дизайн и код успешно сгенерированы.";
             } else {
-                htmlCodeContainer.innerText = `[Ошибка генерации]: ${response.error}`;
-                statusMessage.textContent = `Ошибка: Не удалось получить ответ.`;
+                statusMessage.textContent = `Ошибка: ${response.error}`;
             }
 
-            updateLineNumbers('htmlCode', 'htmlLines');
+            // Обновляем нумерацию и предпросмотр
+            ['htmlCode', 'cssCode', 'jsCode'].forEach(id => {
+                updateLineNumbers(id, id.replace('Code', 'Lines'));
+            });
             renderLiveCode();
             
             generateBtn.disabled = false;
