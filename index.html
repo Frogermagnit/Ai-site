@@ -228,7 +228,7 @@
         }
 
         .editor-title.html { color: #437199; }
-        .editor-title.css { color: ##36d3a5; }
+        .editor-title.css { color: #42d3a5; }
         .editor-title.js { color: #764399; }
 
         .copy-btn {
@@ -397,7 +397,7 @@
 
     <header>
         <div class="brand">
-            <h1>Ai Assistant</h1>
+            <h1>Dwarf</h1>
             <p>Your best choice to get site design</p>
         </div>
         <div class="auth-buttons">
@@ -418,7 +418,7 @@
             </div>
             <button class="btn-generate" id="generateBtn">Generate</button>
         </div>
-        <div class="word-hint" id="wordHint">Min 3 words</div>
+        <div class="word-hint" id="wordHint">Min 5 words</div>
 
         <div id="statusMessage" class="status-bar"></div>
 
@@ -504,7 +504,7 @@
             const words = this.value.trim().split(/\s+/).filter(w => w.length > 0).length;
             if (words < 3) {
                 wordHint.style.color = '#e74c3c';
-                wordHint.textContent = `Min 3 words (current: ${words})`;
+                wordHint.textContent = `Min 5 words (current: ${words})`;
             } else {
                 wordHint.style.color = '#42d3a5';
                 wordHint.textContent = `Words: ${words}`;
