@@ -33,7 +33,7 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
     if (wordCount < MIN_WORDS_COUNT) {
         return {
             success: false,
-            error: `Слишком короткий запрос. Введите минимум ${MIN_WORDS_COUNT} слова.`
+            error: `Insert min ${MIN_WORDS_COUNT} words.`
         };
     }
 
@@ -41,7 +41,7 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
         // ----------------------------------------------------
         // ЭТАП 1: Создание детального UI/UX Технического Задания
         // ----------------------------------------------------
-        if (onStatusChange) onStatusChange("Анализ запроса и проектирование UI/UX...");
+        if (onStatusChange) onStatusChange("Analysis and UI/UX Design...");
 
         const step1Response = await fetch(WORKER_URL, {
             method: "POST",
@@ -65,21 +65,21 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
 
         if (!step1Response.ok) {
             const errData = await step1Response.json().catch(() => ({}));
-            const msg = errData.error?.message || `Код ошибки: ${step1Response.status}`;
-            throw new Error(`Ошибка на этапе проектирования: ${msg}`);
+            const msg = errData.error?.message || `Error: ${step1Response.status}`;
+            throw new Error(`An error during the design phase: ${msg}`);
         }
 
         const step1Data = await step1Response.json();
         const refinedPrompt = cleanCode(step1Data.choices?.[0]?.message?.content);
 
         if (!refinedPrompt) {
-            throw new Error("Не удалось сформулировать ТЗ.");
+            throw new Error("We were unable to formulate the technical specifications.");
         }
 
         // ----------------------------------------------------
         // ЭТАП 2: Генерация современно сверстанного кода (HTML, CSS, JS)
         // ----------------------------------------------------
-        if (onStatusChange) onStatusChange("Генерация HTML, CSS и JS...");
+        if (onStatusChange) onStatusChange("Generating HTML, CSS, and JS...");
 
         const safePrompt = refinedPrompt.length > 3000 ? refinedPrompt.slice(0, 3000) : refinedPrompt;
 
@@ -118,8 +118,8 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
 
         if (!step2Response.ok) {
             const errData = await step2Response.json().catch(() => ({}));
-            const msg = errData.error?.message || `Код ошибки: ${step2Response.status}`;
-            throw new Error(`Ошибка на этапе генерации кода: ${msg}`);
+            const msg = errData.error?.message || `Error: ${step2Response.status}`;
+            throw new Error(`Error during code generation: ${msg}`);
         }
 
         const step2Data = await step2Response.json();
@@ -137,7 +137,7 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
 
             parsedCode = JSON.parse(cleanedRaw);
         } catch (e) {
-            console.warn("Стандартный JSON.parse не справился, включаем аварийный извлекатель...", e);
+            console.warn("The standard JSON.parse didn't work, so we're using the fallback parser...", e);
 
             // 2. Аварийное извлечение регулярными выражениями, если JSON "сломан"
             const extractKey = (keyName) => {
@@ -174,7 +174,7 @@ window.generateWebsite = async function (userPrompt, onStatusChange) {
         console.error("AI Generation Error:", error);
         return {
             success: false,
-            error: error.message || "Ошибка соединения."
+            error: error.message || "Connection error."
         };
     }
 };
